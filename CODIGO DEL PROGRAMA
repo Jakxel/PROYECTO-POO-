@@ -1,0 +1,91 @@
+let entidades = [];
+
+function setup() {
+  createCanvas(400, 400);
+  colorMode(HSB, 360, 100, 100);
+
+  //boton para cambiar color
+  let cambiarColorBtn = createButton('Cambiar color');
+  cambiarColorBtn.position(100, 20);
+  cambiarColorBtn.mousePressed(cambiarColor);
+
+  // boton para borar
+  let borrarBtn = createButton('Borrar todo');
+  borrarBtn.position(10, 20);
+  borrarBtn.mousePressed(borrarTodo);
+}
+
+function draw() {
+  background(255);
+
+  for (let entidad of entidades) {
+    entidad.mostrar();
+  }
+}
+
+function mousePressed() {
+  //se crea una entidad al dar click
+  entidades.push(new Linea(mouseX, mouseY, random(5, 10), color(random(360), 100, 100)));
+}
+
+function cambiarColor() {
+  // Se cambia el color 
+  for (let entidad of entidades) {
+    if (entidad instanceof Linea) {
+      entidad.cambiarColor(color(random(360), 100, 100));
+    }
+  }
+}
+
+function borrarTodo() {
+  // Borra todas las entidades
+  entidades = [];
+}
+
+class Entidad {
+  constructor(x, y) {
+    this.pos = createVector(x, y);
+  }
+
+  mostrar() {
+    // No hace nada en esta clase general
+  }
+}
+
+class Linea extends Entidad {
+  constructor(x, y, tamano, color) {
+    super(x, y);
+    this.tamano = tamano;
+    this.color = color;
+    this.trayectoria = [this.pos];
+  }
+
+  mostrar() {
+    noFill();
+    strokeWeight(this.tamano);
+    stroke(this.color);
+
+    beginShape();
+    for (let punto of this.trayectoria) {
+      vertex(punto.x, punto.y);
+    }
+    endShape();
+  }
+
+  cambiarColor(nuevoColor) {
+    this.color = nuevoColor;
+  }
+
+  agregarPunto(punto) {
+    this.trayectoria.push(punto);
+  }
+}
+
+function mouseDragged() {
+  // Agrega un nuevo punto a todas las líneas cuando se arrastra el mouse
+  for (let entidad of entidades) {
+    if (entidad instanceof Linea) {
+      entidad.agregarPunto(createVector(mouseX, mouseY));
+    }
+  }
+}
